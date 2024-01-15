@@ -70,6 +70,68 @@ def register():
     Button(register_screen, text="Register", command=finish_reg, font=('Calibri', 12)).grid(row=5, sticky=N, pady=10)
 
 
+def finish_edit_profile():
+    edit_name = edit_temp_name.get()
+    edit_age = edit_temp_age.get()
+    edit_gender = edit_temp_gender.get()
+    edit_password = edit_temp_password.get()
+
+    if edit_name == "" or edit_age == "" or edit_gender == "" or edit_password == "":
+        edit_notif.config(fg="red", text="All fields are required")
+        return
+    else:
+        file = open(login_name, "r+")
+        data = file.read()
+        data = data.split('\n')
+        data[0] = edit_name
+        data[1] = edit_password
+        data[2] = edit_age
+        data[3] = edit_gender
+        edited = "\n".join(data)
+        file.seek(0)
+        file.truncate(0)
+        file.write(edited)
+        file.close()
+        os.rename(login_name, edit_name)
+        edit_notif.config(fg="green", text="Account has been edited")
+
+
+def edit_profile():
+    # Vars
+    global edit_temp_name
+    global edit_temp_age
+    global edit_temp_gender
+    global edit_temp_password
+    global edit_notif
+    edit_temp_name = StringVar()
+    edit_temp_age = StringVar()
+    edit_temp_gender = StringVar()
+    edit_temp_password = StringVar()
+
+    # Register Screen
+    edit_profile_screen = Toplevel(master)
+    edit_profile_screen.title('Edit Profile')
+
+    # Labels
+    Label(edit_profile_screen, text="Please enter your new details below to edit profile", font=('Calibri', 12)).grid(row=0, sticky=N,
+                                                                                                                pady=10)
+    Label(edit_profile_screen, text="Name", font=('Calibri', 12)).grid(row=1, sticky=W)
+    Label(edit_profile_screen, text="Age", font=('Calibri', 12)).grid(row=2, sticky=W)
+    Label(edit_profile_screen, text="Gender", font=('Calibri', 12)).grid(row=3, sticky=W)
+    Label(edit_profile_screen, text="Password", font=('Calibri', 12)).grid(row=4, sticky=W)
+    edit_notif = Label(edit_profile_screen, font=('Calibri', 12))
+    edit_notif.grid(row=6, sticky=N, pady=10)
+
+    # Entries
+    Entry(edit_profile_screen, textvariable=edit_temp_name).grid(row=1, column=0)
+    Entry(edit_profile_screen, textvariable=edit_temp_age).grid(row=2, column=0)
+    Entry(edit_profile_screen, textvariable=edit_temp_gender).grid(row=3, column=0)
+    Entry(edit_profile_screen, textvariable=edit_temp_password, show="*").grid(row=4, column=0)
+
+    # Buttons
+    Button(edit_profile_screen, text="Edit", command=finish_edit_profile, font=('Calibri', 12)).grid(row=5, sticky=N, pady=10)
+
+
 def login_session():
     global login_name
     all_accounts = os.listdir()
@@ -97,6 +159,8 @@ def login_session():
                        command=deposit).grid(row=3, sticky=N, padx=10)
                 Button(account_dashboard, text="Withdraw", font=('Calibri', 12), width=30,
                        command=withdraw).grid(row=4, sticky=N, padx=10)
+                Button(account_dashboard, text="Edit Profile", font=('Calibri', 12), width=30,
+                       command=edit_profile).grid(row=5, sticky=N, padx=10)
                 Label(account_dashboard).grid(row=5, sticky=N, pady=10)
                 return
             else:
