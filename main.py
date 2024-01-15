@@ -107,11 +107,108 @@ def login_session():
 
 
 def deposit():
-    print('deposit')
+    # Vars
+    global amount
+    global deposit_notif
+    global current_balance_label
+    amount = StringVar()
+    file = open(login_name, 'r')
+    file_data = file.read()
+    user_details = file_data.split('\n')
+    details_balance = user_details[4]
+    # Deposit Screen
+    deposit_screen = Toplevel(master)
+    deposit_screen.title('Deposit')
+    # Label
+    Label(deposit_screen, text="Deposit", font=('Calibri', 12)).grid(row=0, sticky=N, pady=10)
+    current_balance_label = Label(deposit_screen, text="Current Balance: £"+details_balance, font=('Calibri', 12))
+    current_balance_label.grid(row=1, sticky=W)
+    Label(deposit_screen, text="Amount: ", font=('Calibri', 12)).grid(row=2, sticky=W)
+    deposit_notif = Label(deposit_screen, font=('Calibri', 12))
+    deposit_notif.grid(row=4, sticky=N, pady=5)
+    # Entry
+    Entry(deposit_screen, textvariable=amount).grid(row=2, column=1, sticky=W)
+    # Button
+    Button(deposit_screen, text="Finish", font=('Calibri', 12), command=finish_deposit).grid(row=3, sticky=W, pady=5)
+
+
+def finish_deposit():
+    if amount.get() == "":
+        deposit_notif.config(text="Amount is required", fg='red')
+        return
+    if float(amount.get()) <= 0:
+        deposit_notif.config(text="Negative currency is not accepted", fg='red')
+        return
+
+    file = open(login_name, 'r+')
+    file_data = file.read()
+    details = file_data.split('\n')
+    current_balance = details[4]
+    updated_balance = current_balance
+    updated_balance = float(updated_balance) + float(amount.get())
+    file_data = file_data.replace(current_balance, str(updated_balance))
+    file.seek(0)
+    file.truncate(0)
+    file.write(file_data)
+    file.close()
+
+    current_balance_label.config(text="Current Balance: £"+str(updated_balance), fg='green')
+    deposit_notif.config(text="Balance Updated", fg='green')
 
 
 def withdraw():
-    print('withdraw')
+    # Vars
+    global withdraw_amount
+    global withdraw_notif
+    global current_balance_label
+    withdraw_amount = StringVar()
+    file = open(login_name, 'r')
+    file_data = file.read()
+    user_details = file_data.split('\n')
+    details_balance = user_details[4]
+    # Deposit Screen
+    withdraw_screen = Toplevel(master)
+    withdraw_screen.title('Withdraw')
+    # Label
+    Label(withdraw_screen, text="Withdraw", font=('Calibri', 12)).grid(row=0, sticky=N, pady=10)
+    current_balance_label = Label(withdraw_screen, text="Current Balance: £" + details_balance, font=('Calibri', 12))
+    current_balance_label.grid(row=1, sticky=W)
+    Label(withdraw_screen, text="Amount: ", font=('Calibri', 12)).grid(row=2, sticky=W)
+    withdraw_notif = Label(withdraw_screen, font=('Calibri', 12))
+    withdraw_notif.grid(row=4, sticky=N, pady=5)
+    # Entry
+    Entry(withdraw_screen, textvariable=withdraw_amount).grid(row=2, column=1, sticky=W)
+    # Button
+    Button(withdraw_screen, text="Finish", font=('Calibri', 12), command=finish_withdraw).grid(row=3, sticky=W, pady=5)
+
+
+def finish_withdraw():
+    if withdraw_amount.get() == "":
+        withdraw_notif.config(text="Amount is required", fg='red')
+        return
+    if float(withdraw_amount.get()) <= 0:
+        withdraw_notif.config(text="Negative currency is not accepted", fg='red')
+        return
+
+    file = open(login_name, 'r+')
+    file_data = file.read()
+    details = file_data.split('\n')
+    current_balance = details[4]
+
+    if float(withdraw_amount.get()) > float(current_balance):
+        withdraw_notif.config(text="Insufficient Funds!", fg='red')
+        return
+
+    updated_balance = current_balance
+    updated_balance = float(updated_balance) - float(withdraw_amount.get())
+    file_data = file_data.replace(current_balance, str(updated_balance))
+    file.seek(0)
+    file.truncate(0)
+    file.write(file_data)
+    file.close()
+
+    current_balance_label.config(text="Current Balance: £"+str(updated_balance), fg='green')
+    withdraw_notif.config(text="Balance Updated", fg='green')
 
 
 def personal_details():
